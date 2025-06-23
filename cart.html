@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Cart | ShopSwift</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f0f2ff, #e1e8ff);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: #6c63ff;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    #cart {
+      flex: 1;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .cart-item {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .cart-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .cart-item img {
+      max-height: 120px;
+      margin-bottom: 1rem;
+      object-fit: contain;
+    }
+
+    .cart-item h3 {
+      font-size: 1rem;
+      color: #333;
+      margin: 0.5rem 0;
+    }
+
+    .cart-item p {
+      font-size: 0.95rem;
+      margin: 0.25rem;
+      color: #555;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      background: none;
+      color: #6c63ff;
+      animation: glow 2.5s ease-in-out infinite;
+      margin-top: auto;
+    }
+
+    @keyframes glow {
+      0% { text-shadow: 0 0 5px #6c63ff; }
+      50% { text-shadow: 0 0 15px #6c63ff; }
+      100% { text-shadow: 0 0 5px #6c63ff; }
+    }
+    .remove-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.remove-btn:hover {
+  background-color: #e60000;
+}
+
+  </style>
+</head>
+
+<body>
+
+<header>
+  🛒 Your Cart
+  <a href="index.html">← Back to Shop</a>
+</header>
+
+<main id="cart">
+  <!-- Cart items will appear here -->
+</main>
+
+<footer>
+  Made with ❤️ by Himanshu Chauhan & Jyoti Mehra
+</footer>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<div id="toast"></div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyB-wSG39IWRS2uvJh-a9roqLZjOMRMUV7s",
+    authDomain: "swiftshop-ea783.firebaseapp.com",
+    projectId: "swiftshop-ea783"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+  
+  
+  function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.className = "show";
+  setTimeout(() => {
+    toast.className = toast.className.replace("show", "");
+  }, 2500);
+}
+
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    const uid = user.uid;
+    const cartDiv = document.getElementById("cart");
+
+    db.collection("users").doc(uid).collection("cart").get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          cartDiv.innerHTML = `<p style="font-size:1.2rem; color:#444;">Your cart is empty 😔</p>`;
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const item = doc.data();
+          const itemId = doc.id;
+
+          const card = document.createElement("div");
+          card.className = "cart-item";
+          card.innerHTML = `
+            <img src="${item.image}" alt="${item.title}">
+            <h3>${item.title.slice(0, 40)}...</h3>
+            <p><strong>₹${item.price}</strong></p>
+            <p>Qty: ${item.quantity}</p>
+            <button class="remove-btn">🗑 Remove</button>
+          `;
+
+          //  Remove 
+          card.querySelector(".remove-btn").addEventListener("click", () => {
+            db.collection("users").doc(uid).collection("cart").doc(itemId)
+              .delete()
+              .then(() => {
+                card.remove(); // instantly remove from UI
+                showToast("🗑 Item removed from cart");
+              })
+              .catch(err => {
+                alert("Error removing item: " + err.message);
+              });
+          });
+
+          cartDiv.appendChild(card);
+        });
+      });
+  } else {
+    window.location.href = "login.html";
+  }
+});
+
+</script>
+
+</body>
+</html>

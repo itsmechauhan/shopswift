@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopSwift - Home</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+
+  <header>
+    🛍️ ShopSwift - Your Online Store
+
+    <div style="flex:1; text-align:center;">
+      <input type="text" id="searchInput" placeholder="Search products..." />
+    </div>
+
+    <div>
+      <a href="cart.html" style="color: #ffd700; margin-right: 1rem;">🛒 View Cart</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+
+  <div id="toast"></div>
+
+  <main>
+    <section id="products">
+     
+    </section>
+  </main>
+
+ 
+  <footer>
+    Made with ❤️ by Himanshu Chauhan & Jyoti Mehra
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+
+  <script src="app.js"></script>
+</body>
+</html>
