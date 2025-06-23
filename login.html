@@ -117,22 +117,60 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-    function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => window.location.href = "index.html")
-        .catch(e => alert(e.message));
-    }
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch(error => {
+      switch (error.code) {
+        case "auth/wrong-password":
+        case "auth/user-not-found":
+          alert("Incorrect email or password.");
+          break;
+        case "auth/invalid-email":
+          alert("Please enter a valid email address.");
+          break;
+        default:
+          alert("Login failed. Please Check Email or Password and try again later.");
+          console.error("Login error:", error);
+      }
+    });
+}
 
-    function register() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(() => window.location.href = "index.html")
-        .catch(e => alert(e.message));
-    }
+function register() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (password.length < 6) {
+    alert("Password must be at least 6 characters long.");
+    return;
+  }
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch(error => {
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          alert("This email is already registered. Try logging in.");
+          break;
+        case "auth/invalid-email":
+          alert("Please enter a valid email address.");
+          break;
+        case "auth/weak-password":
+          alert("Password should be at least 6 characters.");
+          break;
+        default:
+          alert("Registration failed. Please try again later.");
+          console.error("Register error:", error);
+      }
+    });
+}
   </script>
   
 </body>
